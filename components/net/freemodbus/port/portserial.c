@@ -37,6 +37,7 @@ static struct rt_thread thread_serial_soft_trans_irq;
 static struct rt_event event_serial;
 /* modbus slave serial device */
 static rt_serial_t *serial;
+static rt_device_t rt_sdev;
 
 /* ----------------------- Defines ------------------------------------------*/
 /* serial transmit event */
@@ -51,7 +52,8 @@ static void serial_soft_trans_irq(void* parameter);
 /* ----------------------- Start implementation -----------------------------*/
 BOOL xMBPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
         eMBParity eParity)
-{
+{    
+    struct serial_configure ser_config = RT_SERIAL_CONFIG_DEFAULT; 
     /**
      * set 485 mode receive and transmit control IO
      * @note MODBUS_SLAVE_RT_CONTROL_PIN_INDEX need be defined by user
@@ -65,10 +67,10 @@ BOOL xMBPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
         extern struct rt_serial_device serial1;
         serial = &serial1;
 #endif
-    } else if (ucPORT == 2) {
-#if defined(RT_USING_UART2)
-        extern struct rt_serial_device serial2;
-        serial = &serial2;
+    } else if (ucPORT == 5) {
+#if defined(BSP_USING_UART5)
+        extern struct rt_serial_device serial5;
+        serial = &serial5;
 #endif
     } else if (ucPORT == 3) {
 #if defined(RT_USING_UART3)
@@ -77,35 +79,22 @@ BOOL xMBPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
 #endif
     }
     /* set serial configure parameter */
-    serial->config.baud_rate = ulBaudRate;
-    serial->config.stop_bits = STOP_BITS_1;
-    switch(eParity){
-    case MB_PAR_NONE: {
-        serial->config.data_bits = DATA_BITS_8;
-        serial->config.parity = PARITY_NONE;
-        break;
-    }
-    case MB_PAR_ODD: {
-        serial->config.data_bits = DATA_BITS_9;
-        serial->config.parity = PARITY_ODD;
-        break;
-    }
-    case MB_PAR_EVEN: {
-        serial->config.data_bits = DATA_BITS_9;
-        serial->config.parity = PARITY_EVEN;
-        break;
-    }
-    }
-    /* set serial configure */
-    serial->ops->configure(serial, &(serial->config));
+    ser_config.baud_rate = BAUD_RATE_9600;
+    ser_config.data_bits = DATA_BITS_8;
+    ser_config.stop_bits = STOP_BITS_1;
+    ser_config.parity = PARITY_NONE;
 
-    /* open serial device */
-    if (!rt_device_open(&serial->parent, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_INT_RX)) {
-        rt_device_set_rx_indicate(&serial->parent, serial_rx_ind);
+    rt_sdev = rt_device_find("uart5");
+    
+    
+        /* open serial device */
+    if (!rt_device_open(rt_sdev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_INT_RX)) {
+        rt_device_control(rt_sdev, RT_DEVICE_CTRL_CONFIG, &ser_config);
+        rt_device_set_rx_indicate(rt_sdev, serial_rx_ind);
     } else {
         return FALSE;
-    }
-
+    } 
+    
     /* software initialize */
     rt_event_init(&event_serial, "slave event", RT_IPC_FLAG_PRIO);
     rt_thread_init(&thread_serial_soft_trans_irq,
@@ -124,7 +113,7 @@ void vMBPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable)
 {
     rt_uint32_t recved_event;
     if (xRxEnable)
-    {
+    { 
         /* enable RX interrupt */
         serial->ops->control(serial, RT_DEVICE_CTRL_SET_INT, (void *)RT_DEVICE_FLAG_INT_RX);
         /* switch 485 to receive mode */
@@ -162,13 +151,16 @@ void vMBPortClose(void)
 
 BOOL xMBPortSerialPutByte(CHAR ucByte)
 {
-    serial->parent.write(&(serial->parent), 0, &ucByte, 1);
+//    serial->parent.write(&(serial->parent), 0, &ucByte, 1);
+    rt_device_write(rt_sdev, 0, &ucByte, 1);
     return TRUE;
 }
 
 BOOL xMBPortSerialGetByte(CHAR * pucByte)
 {
-    serial->parent.read(&(serial->parent), 0, pucByte, 1);
+//    serial->parent.read(&(serial->parent), 0, pucByte, 1);
+    rt_device_read(rt_sdev, 0, pucByte, 1);
+//    rt_kprintf("rd:%x\n",*pucByte);
     return TRUE;
 }
 

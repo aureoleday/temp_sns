@@ -19,6 +19,7 @@
  * File: $Id: user_mb_app.c,v 1.60 2013/11/23 11:49:05 Armink $
  */
 #include "user_mb_app.h"
+#include "drv_autoaddr.h"
 
 /*------------------------Slave mode use these variables----------------------*/
 //Slave mode:DiscreteInputs variables
@@ -41,6 +42,74 @@ USHORT   usSRegInBuf[S_REG_INPUT_NREGS]               ;
 //Slave mode:HoldingRegister variables
 USHORT   usSRegHoldStart                              = S_REG_HOLDING_START;
 USHORT   usSRegHoldBuf[S_REG_HOLDING_NREGS]           ;
+
+#define SOFT_VER 1
+
+enum
+{
+    MBS_ADDR_IND = 0,
+    MBS_STATUS_IND,
+    MS5837_TEMP_IND,
+    MS5837_PRES_IND,
+    TMP117_TEMP_IND,
+    SOFT_VER_IND
+};
+
+void mbs_sts_update(void)// 更新本地变量到协议栈寄存器中
+{
+    usSRegHoldBuf[MBS_STATUS_IND] = drv_autoaddr_get_fsm();
+    usSRegHoldBuf[MS5837_TEMP_IND] = 1;
+    usSRegHoldBuf[MS5837_PRES_IND] = 2;
+    usSRegHoldBuf[TMP117_TEMP_IND] = 3;
+}
+
+void mbs_sts_init(void)
+{
+    usSRegHoldBuf[SOFT_VER_IND] = SOFT_VER;
+    usSRegHoldBuf[MBS_ADDR_IND] = drv_autoaddr_get_addr();
+}
+
+void modbus_slave_thread_entry(void* parameter)
+{
+		eMBErrorCode    eStatus = MB_ENOERR;
+	
+		rt_thread_delay(2000);
+  
+    while(1)
+    {
+        if(drv_autoaddr_get_addr() == 0)
+            rt_thread_mdelay(1000);
+        else
+        {
+            eStatus = eMBInit(MB_RTU, drv_autoaddr_get_addr() , 5, 9600,  MB_PAR_NONE);
+            break;
+        }
+    }  
+	
+    mbs_sts_init();
+    
+		if(eStatus != MB_ENOERR)
+		{
+				rt_kprintf("MB_SLAVE init failed\n");
+		}
+		eStatus = eMBEnable();			
+		if(eStatus != MB_ENOERR)
+		{
+				rt_kprintf("MB_SLAVE enable failed\n");	
+		}
+		while(1)
+		{
+        
+				eStatus = eMBPoll();
+				if(eStatus != MB_ENOERR)
+				{
+						rt_kprintf("MB_SLAVE enable failed\n");	
+				}	
+				mbs_sts_update();	
+				rt_thread_mdelay(20);
+		}
+}
+
 
 /**
  * Modbus slave input register callback function.
@@ -284,3 +353,13 @@ eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT us
     return eStatus;
 }
 
+static void mbs_info(void)
+{
+    uint8_t i;
+    for(i=0;i<S_REG_HOLDING_NREGS;i++)
+    {
+        rt_kprintf("reg %d: %x\n",i,usSRegHoldBuf[i]);
+    }
+}
+
+MSH_CMD_EXPORT(mbs_info, modbus slave holding regs)

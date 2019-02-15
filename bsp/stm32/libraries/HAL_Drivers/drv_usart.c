@@ -72,6 +72,15 @@ static struct stm32_uart_config uart_config[] =
 #endif
 };
 
+#ifdef BSP_USING_UART1
+struct rt_serial_device serial1;
+#endif
+
+#ifdef BSP_USING_UART5
+struct rt_serial_device serial5;
+#endif
+
+
 static struct stm32_uart uart_obj[sizeof(uart_config) / sizeof(uart_config[0])] = {0};
 
 static rt_err_t stm32_configure(struct rt_serial_device *serial, struct serial_configure *cfg)
@@ -81,7 +90,7 @@ static rt_err_t stm32_configure(struct rt_serial_device *serial, struct serial_c
     RT_ASSERT(cfg != RT_NULL);
     uart = (struct stm32_uart *)serial->parent.user_data;
     RT_ASSERT(uart != RT_NULL);
-
+    
     uart->handle.Instance          = uart->config->Instance;
     uart->handle.Init.BaudRate     = cfg->baud_rate;
     uart->handle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
@@ -603,14 +612,14 @@ int rt_hw_usart_init(void)
     struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
     rt_err_t result = 0;
 
-    stm32_uart_get_dma_config();
-    
+    stm32_uart_get_dma_config();   
+  
     for (int i = 0; i < obj_num; i++)
     {
         uart_obj[i].config = &uart_config[i];
         uart_obj[i].serial.ops    = &stm32_uart_ops;
-        uart_obj[i].serial.config = config;
-
+        uart_obj[i].serial.config = config;          
+      
 #if defined(RT_SERIAL_USING_DMA)
         if(uart_obj[i].uart_dma_flag)
         {
@@ -629,7 +638,14 @@ int rt_hw_usart_init(void)
         }
         RT_ASSERT(result == RT_EOK);
     }
+#ifdef BSP_USING_UART1
+    serial1 = uart_obj[UART1_INDEX].serial;
+#endif
 
+#ifdef BSP_USING_UART5
+    serial5 = uart_obj[UART5_INDEX].serial;
+#endif      
+    
     return result;
 }
 
