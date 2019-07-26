@@ -324,8 +324,8 @@
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
-            <v6LangP>1</v6LangP>
+            <v6Lang>3</v6Lang>
+            <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER, STM32F051x8</Define>
               <Undefine></Undefine>
-              <IncludePath>.;..\..\..\include;applications;.;board;board\CubeMX_Config\Inc;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\..\..\libcpu\arm\common;..\..\..\libcpu\arm\cortex-m0;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\finsh;..\..\..\components\net\freemodbus\modbus\include;..\..\..\components\net\freemodbus\modbus\rtu;..\..\..\components\net\freemodbus\port;..\libraries\STM32F0xx_HAL\CMSIS\Device\ST\STM32F0xx\Include;..\libraries\STM32F0xx_HAL\STM32F0xx_HAL_Driver\Inc;..\libraries\STM32F0xx_HAL\CMSIS\Include</IncludePath>
+              <IncludePath>.;..\..\..\include;applications;.;board;board\CubeMX_Config\Inc;..\libraries\HAL_Drivers;..\libraries\HAL_Drivers\config;..\..\..\libcpu\arm\common;..\..\..\libcpu\arm\cortex-m0;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\components\finsh;..\..\..\components\net\freemodbus\modbus\include;..\..\..\components\net\freemodbus\modbus\rtu;..\..\..\components\net\freemodbus\port;..\libraries\STM32F0xx_HAL\CMSIS\Device\ST\STM32F0xx\Include;..\libraries\STM32F0xx_HAL\STM32F0xx_HAL_Driver\Inc;..\libraries\STM32F0xx_HAL\CMSIS\Include;drv</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -369,7 +369,7 @@
             <ScatterFile>.\board\linker_scripts\link.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc> --keep *.o(.rti_fn.*)   --keep *.o(FSymTab)</Misc>
+            <Misc>--keep *.o(.rti_fn.*)   --keep *.o(FSymTab)</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -820,19 +820,44 @@
               <FilePath>..\libraries\STM32F0xx_HAL\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_usart.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f0xx_hal_i2c.c</FileName>
+              <FileName>stm32f0xx_hal_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\libraries\STM32F0xx_HAL\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal_i2c.c</FilePath>
+              <FilePath>.\board\CubeMX_Config\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal_flash.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f0xx_ll_i2c.c</FileName>
+              <FileName>stm32f0xx_hal_flash_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\libraries\STM32F0xx_HAL\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_i2c.c</FilePath>
+              <FilePath>.\board\CubeMX_Config\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal_flash_ex.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>drv</GroupName>
+          <Files>
+            <File>
+              <FileName>drv_autoaddr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drv\drv_autoaddr.c</FilePath>
             </File>
             <File>
-              <FileName>Src_stm32f0xx_ll_i2c.c</FileName>
+              <FileName>drv_ms5837.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\libraries\STM32F0xx_HAL\STM32F0xx_HAL_Driver\Src\stm32f0xx_ll_i2c.c</FilePath>
+              <FilePath>.\drv\drv_ms5837.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_tmp117.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drv\drv_tmp117.c</FilePath>
+            </File>
+            <File>
+              <FileName>bit_op.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drv\bit_op.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drv\drv_flash.c</FilePath>
             </File>
           </Files>
         </Group>

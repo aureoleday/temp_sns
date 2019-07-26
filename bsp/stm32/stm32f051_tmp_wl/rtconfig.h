@@ -15,7 +15,7 @@
 #define RT_USING_HOOK
 #define RT_USING_IDLE_HOOK
 #define RT_IDEL_HOOK_LIST_SIZE 4
-#define IDLE_THREAD_STACK_SIZE 256
+#define IDLE_THREAD_STACK_SIZE 128
 #define RT_DEBUG
 
 /* Inter-Thread communication */
@@ -47,8 +47,8 @@
 
 #define RT_USING_COMPONENTS_INIT
 #define RT_USING_USER_MAIN
-#define RT_MAIN_THREAD_STACK_SIZE 512
-#define RT_MAIN_THREAD_PRIORITY 10
+#define RT_MAIN_THREAD_STACK_SIZE 256
+#define RT_MAIN_THREAD_PRIORITY   10
 
 /* C++ features */
 
@@ -62,7 +62,7 @@
 #define FINSH_USING_SYMTAB
 #define FINSH_USING_DESCRIPTION
 #define FINSH_THREAD_PRIORITY 20
-#define FINSH_THREAD_STACK_SIZE 1024
+#define FINSH_THREAD_STACK_SIZE 768
 #define FINSH_CMD_SIZE 80
 #define FINSH_USING_MSH
 #define FINSH_USING_MSH_DEFAULT
@@ -75,7 +75,7 @@
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
-#define RT_PIPE_BUFSZ 512
+#define RT_PIPE_BUFSZ 256
 #define RT_USING_SERIAL
 #define RT_SERIAL_USING_DMA
 #define RT_USING_I2C
@@ -178,8 +178,12 @@
 #define BSP_USING_UART1
 #define BSP_USING_UART2
 #define BSP_USING_I2C1
-#define BSP_I2C1_SCL_PIN 15
-#define BSP_I2C1_SDA_PIN 16
+#define BSP_I2C1_SCL_PIN GET_PIN(B, 6)
+#define BSP_I2C1_SDA_PIN GET_PIN(B, 7)
+#define BSP_USING_I2C2
+#define BSP_I2C2_SCL_PIN GET_PIN(A, 1)
+#define BSP_I2C2_SDA_PIN GET_PIN(A, 0)
+
 
 /* Board extended module Drivers */
 

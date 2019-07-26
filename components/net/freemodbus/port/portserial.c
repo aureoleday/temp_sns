@@ -30,7 +30,7 @@
 /* ----------------------- Static variables ---------------------------------*/
 ALIGN(RT_ALIGN_SIZE)
 /* software simulation serial transmit IRQ handler thread stack */
-static rt_uint8_t serial_soft_trans_irq_stack[512];
+static rt_uint8_t serial_soft_trans_irq_stack[256];
 /* software simulation serial transmit IRQ handler thread */
 static struct rt_thread thread_serial_soft_trans_irq;
 /* serial event */
@@ -84,8 +84,7 @@ BOOL xMBPortSerialInit(UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits,
     ser_config.stop_bits = STOP_BITS_1;
     ser_config.parity = PARITY_NONE;
 
-    rt_sdev = rt_device_find("uart5");
-    
+    rt_sdev = rt_device_find("uart1"); 
     
         /* open serial device */
     if (!rt_device_open(rt_sdev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_INT_RX)) {
@@ -115,7 +114,8 @@ void vMBPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable)
     if (xRxEnable)
     { 
         /* enable RX interrupt */
-        serial->ops->control(serial, RT_DEVICE_CTRL_SET_INT, (void *)RT_DEVICE_FLAG_INT_RX);
+//        serial->ops->control(serial, RT_DEVICE_CTRL_SET_INT, (void *)RT_DEVICE_FLAG_INT_RX);
+        rt_device_control(rt_sdev, RT_DEVICE_CTRL_SET_INT, (void *)RT_DEVICE_FLAG_INT_RX);
         /* switch 485 to receive mode */
 #if defined(RT_MODBUS_SLAVE_USE_CONTROL_PIN)
         rt_pin_write(MODBUS_SLAVE_RT_CONTROL_PIN_INDEX, PIN_LOW);
@@ -128,7 +128,8 @@ void vMBPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable)
         rt_pin_write(MODBUS_SLAVE_RT_CONTROL_PIN_INDEX, PIN_HIGH);
 #endif
         /* disable RX interrupt */
-        serial->ops->control(serial, RT_DEVICE_CTRL_CLR_INT, (void *)RT_DEVICE_FLAG_INT_RX);
+//        serial->ops->control(serial, RT_DEVICE_CTRL_CLR_INT, (void *)RT_DEVICE_FLAG_INT_RX);
+        rt_device_control(rt_sdev, RT_DEVICE_CTRL_CLR_INT, (void *)RT_DEVICE_FLAG_INT_RX);
     }
     if (xTxEnable)
     {
