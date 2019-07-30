@@ -21,6 +21,37 @@
 #define LED0_PIN    GET_PIN(A, 15)
 conf_un conf_inst;
 
+IWDG_HandleTypeDef hiwdg;
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
+  hiwdg.Init.Window = 4095;
+  hiwdg.Init.Reload = 3200;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
+
+}
+
 static void led_blink(uint16_t period)
 {
     if(conf_inst.bm_field.addr_fsm == 0)
@@ -48,7 +79,7 @@ static void led_blink(uint16_t period)
 
 int main(void)
 {
-    rt_thread_t init_thread;
+    rt_thread_t init_thread;    
     
     init_thread = rt_thread_create("auto_addr",
                                    autoaddr_thread_entry, RT_NULL,
@@ -66,10 +97,15 @@ int main(void)
     
     /* set LED0 pin mode to output */
     rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
+    MX_IWDG_Init();
     
     while (1)
     {
-        led_blink(2000); 
+        HAL_IWDG_Refresh(&hiwdg);
+        led_blink(2000);        
     }
-    return RT_EOK;
+    //return RT_EOK;
 }
+
+
+

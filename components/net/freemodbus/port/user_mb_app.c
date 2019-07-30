@@ -26,7 +26,7 @@
 #include "drv_flash.h"
 #include "sys_conf.h"
 
-#define SOFT_VER          0x0104
+#define SOFT_VER          0x0105
 #define MODBUS_UART_PORT  1
 
 /*------------------------Slave mode use these variables----------------------*/
@@ -105,6 +105,7 @@ void modbus_slave_thread_entry(void* parameter)
     mbs_hw_init();
 		rt_thread_delay(1000);
   
+  
     while(1)
     {
         if(drv_autoaddr_get_addr() == 0)
@@ -114,6 +115,7 @@ void modbus_slave_thread_entry(void* parameter)
             eStatus = eMBInit(MB_RTU, drv_autoaddr_get_addr() , MODBUS_UART_PORT, 9600,  MB_PAR_NONE);
             break;
         }
+        
     }    
     iflash_init();
     tmp117_init();
